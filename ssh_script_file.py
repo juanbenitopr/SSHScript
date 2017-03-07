@@ -22,7 +22,11 @@ def worker_ssh():
 
 
 try:
-    threads_host = [Thread(target=worker_ssh()).start() for host in hosts_list]
+    threads_host = []
+    for host in hosts_list:
+        t = Thread(target=worker_ssh)
+        t.start()
+        threads_host.append(t)
 
 except pxssh.ExceptionPxssh, e:
     print "pxssh failed on login"
