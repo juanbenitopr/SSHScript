@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import argparse
 import sys
 from threading import Thread
@@ -36,20 +38,36 @@ class SSHConnectionHosts():
                 host_and_pass = host_and_pass.replace("\n", "").split(":")
                 self.hosts_and_pass.append({'host':host_and_pass[0],'password':host_and_pass[1]})
 
+    def add_hosts_and_username_text(self,path):
+        if path:
+            hosts_in_file = open(path,'r')
+            for host_and_username in hosts_in_file:
+                host_and_username = host_and_username.replace("\n", "").split(":")
+                self.hosts_and_pass.append({'host':host_and_username[0],'username':host_and_username[1]})
+
+    def add_all_from_text(self,path):
+        if path:
+            hosts_in_file = open(path,'r')
+            for all_datas in hosts_in_file:
+                all_datas = all_datas.replace("\n", "").split(":")
+                self.hosts_and_pass.append({'host':all_datas[0],'username':all_datas[1],'password':all_datas[2],'command':all_datas[3]})
 
 
     def set_command (self,command):
-        for index in range(len(self.hosts_and_pass)):
-            self.hosts_and_pass[index]['command'] = command
+        if command:
+            for index in range(len(self.hosts_and_pass)):
+                self.hosts_and_pass[index]['command'] = command
 
 
     def set_password(self,password):
-        for index in range(len(self.hosts_and_pass)):
-            self.hosts_and_pass[index]['password'] = password
+        if password:
+            for index in range(len(self.hosts_and_pass)):
+                self.hosts_and_pass[index]['password'] = password
 
     def set_username(self,username):
-        for index in range(len(self.hosts_and_pass)):
-            self.hosts_and_pass[index]['username'] = username
+        if username:
+            for index in range(len(self.hosts_and_pass)):
+                self.hosts_and_pass[index]['username'] = username
 
 
 
@@ -59,6 +77,7 @@ class SSHConnectionHosts():
         ssh_instance.sendline(command)
         ssh_instance.prompt()
         print (ssh_instance.before.decode('utf-8'))
+        print("Disconnecting: %s \n"%host)
         ssh_instance.logout()
 
     def run_ssh(self):
@@ -88,6 +107,8 @@ args = parser.parse_args()
 sshconnection.add_hosts(args.hosts)
 sshconnection.add_hosts_text(args.H)
 sshconnection.add_hosts_and_pass_text(args.Hp)
+sshconnection.add_all_from_text(args.A)
+sshconnection.add_hosts_and_username_text(args.Hu)
 sshconnection.set_username(args.u)
 sshconnection.set_password(args.p)
 sshconnection.set_command(args.c)
